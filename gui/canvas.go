@@ -18,15 +18,11 @@ func DirBar() fyne.CanvasObject {
 	replicate := widget.NewButtonWithIcon("复制", theme.ContentCopyIcon(), func() {
 		copyContent = pwd
 	})
-	paste := widget.NewButtonWithIcon("", theme.ContentPasteIcon(), func() {
-
-	})
-	bar := widget.NewHBox(folder, replicate, paste)
-	canvas := fyne.NewContainerWithLayout(
-		layout.NewBorderLayout(bar, nil, nil, nil),
-		bar,
+	box := widget.NewHBox(folder, replicate)
+	return fyne.NewContainerWithLayout(
+		layout.NewBorderLayout(box, nil, nil, nil),
+		box,
 	)
-	return canvas
 }
 
 func ThemeRadio(a fyne.App) fyne.CanvasObject {
@@ -45,5 +41,12 @@ func ThemeRadio(a fyne.App) fyne.CanvasObject {
 func DirInput() fyne.CanvasObject {
 	entry := widget.NewEntry()
 	entry.SetPlaceHolder("输入要重命名文件的所在文件夹路径")
-	return entry
+	paste := widget.NewButtonWithIcon("粘贴", theme.ContentPasteIcon(), func() {
+		entry.SetText(copyContent)
+	})
+	box := widget.NewHBox(entry, paste)
+	return fyne.NewContainerWithLayout(
+		layout.NewBorderLayout(box, nil, nil, nil),
+		box,
+	)
 }

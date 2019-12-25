@@ -13,17 +13,20 @@ import (
 func init() {
 	if runtime.GOOS == `windows` {
 		os.Setenv("FYNE_FONT", gui.WinFontPath)
+	} else if runtime.GOOS == `linux` {
+		os.Setenv("FYNE_FONT", gui.LinuxFontPath)
 	}
 }
 
 func main() {
 	a := app.New()
 	a.Settings().SetTheme(theme.LightTheme())
+	theme.TextSize()
 	w := a.NewWindow("批量重命名工具")
 	spaceBox := widget.NewHBox(widget.NewToolbarSeparator().ToolbarObject())
 	labelBox := widget.NewVBox(
 		widget.NewLabel("主题:"),
-		widget.NewLabel("当前路径:"), spaceBox,
+		widget.NewLabel("当前路径:"), spaceBox, spaceBox,
 		widget.NewLabel("工作目录:"),
 	)
 	contentBox := widget.NewVBox(
