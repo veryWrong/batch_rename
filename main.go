@@ -2,7 +2,6 @@ package main
 
 import (
 	"batch_rename/gui"
-	"fyne.io/fyne"
 	"fyne.io/fyne/app"
 	"fyne.io/fyne/theme"
 	"fyne.io/fyne/widget"
@@ -18,6 +17,7 @@ func init() {
 	}
 }
 
+// go build -ldflags="-H windowsgui"
 func main() {
 	a := app.New()
 	a.Settings().SetTheme(theme.LightTheme())
@@ -34,8 +34,10 @@ func main() {
 		gui.DirBar(),
 		gui.DirInput(),
 	)
-	content := widget.NewHBox(labelBox, contentBox)
+	group := widget.NewGroup("重命名规则", gui.RuleBox(w))
+	iBox := widget.NewHBox(labelBox, contentBox)
+	content := widget.NewVBox(iBox, group)
 	w.SetContent(content)
-	w.Resize(fyne.NewSize(800, 600))
+	//w.Resize(fyne.NewSize(800, 600))
 	w.ShowAndRun()
 }
