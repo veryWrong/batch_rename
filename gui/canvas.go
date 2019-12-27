@@ -10,10 +10,18 @@ import (
 	"fyne.io/fyne/widget"
 	"image/color"
 	"os"
+	"strings"
+)
+
+const (
+	WinFontPath    = `C:\Windows\Fonts\SIMKAI.TTF`
+	LinuxFontPath  = `/usr/share/fonts/truetype/arphic/ukai.ttc`
+	defaultRandStr = "0123456789abcdefghijklmnopqrstuvwxyz!@$*_-"
 )
 
 var (
 	pwd, _ = os.Getwd()
+	conf   = defaultConf()
 )
 
 func DirBar() fyne.CanvasObject {
@@ -37,41 +45,41 @@ func ThemeRadio(a fyne.App) fyne.CanvasObject {
 
 func DirInput() fyne.CanvasObject {
 	entry := widget.NewEntry()
-	entry.SetText(pwd)
+	entry.SetText(conf.wordDir)
 	entry.SetPlaceHolder("输入要重命名文件的所在文件夹路径")
 	box := widget.NewScrollContainer(widget.NewHBox(entry))
 	return fyne.NewContainerWithLayout(layout.NewBorderLayout(box, nil, nil, nil), box)
 }
 
 func RuleBox(w fyne.Window) fyne.CanvasObject {
-	var reType = "加前缀"
 	box := widget.NewVBox()
-	fixBox := setFixBox(reType, w)
-	renameType := widget.NewRadio([]string{"加前缀", "加后缀", "重命名"}, func(s string) {
+	fixBox := setFixBox(prefix, w)
+	renameType := widget.NewRadio([]string{prefix, suffix, rename}, func(s string) {
 		switch s {
-		case "加前缀":
+		case prefix:
 			fallthrough
-		case "加后缀":
+		case suffix:
 			fixBox.Hide()
 			fixBox = setFixBox(s, w)
-		case "重命名":
+		case rename:
 			fixBox.Hide()
-			box.Children = append(box.Children[:0], box.Children[0:]...)
+			fixBox = renameBox()
+			//box.Children = append(box.Children[:0], box.Children[0:]...)
 		default:
-			//box.Children = box.Children[:1]
 			err := errors.New("请选择一种重命名方式")
 			dialog.ShowError(err, w)
 		}
 		box.Children = append(box.Children[:1], box.Children[2:]...)
 		box.Append(fixBox)
 	})
-	renameType.SetSelected("加前缀")
+	renameType.SetSelected(prefix)
 	renameType.Horizontal = true
-	form := widget.NewForm()
 	fileType := widget.NewEntry()
 	fileType.SetPlaceHolder("example: .jpg,.png")
+	fileType.SetText(strings.Join(conf.fileType, ","))
 	scroll := widget.NewScrollContainer(widget.NewHBox(fileType))
 	contain := fyne.NewContainerWithLayout(layout.NewBorderLayout(scroll, nil, nil, nil), scroll)
+	form := widget.NewForm()
 	form.Append("文件类型:", contain)
 	form.Append("重命名方式:", renameType)
 	box.Append(form)
@@ -86,12 +94,12 @@ func setFixBox(fix string, w fyne.Window) fyne.CanvasObject {
 	s1 := widget.NewScrollContainer(widget.NewHBox(entry1))
 	con1 := fyne.NewContainerWithLayout(layout.NewBorderLayout(s1, nil, nil, nil), s1)
 	text2 := widget.NewLabel("个文件添" + fix)
-	radio := widget.NewRadio([]string{"数字", "字母", "随机"}, func(s string) {
+	radio := widget.NewRadio([]string{numMold, wordMold, randMold}, func(s string) {
 		rect := canvas.NewRectangle(&color.RGBA{R: 255, G: 255, B: 255, A: 0})
 		rect.SetMinSize(fyne.NewSize(150, 0))
 		content := widget.NewEntry()
 		switch s {
-		case "数字":
+		case numMold:
 			content.SetPlaceHolder("example: 0-9")
 			content.OnChanged = func(text string) {
 				//fmt.Println("Entered", text)
@@ -99,7 +107,7 @@ func setFixBox(fix string, w fyne.Window) fyne.CanvasObject {
 			scroll := widget.NewScrollContainer(widget.NewHBox(content))
 			contain := fyne.NewContainerWithLayout(layout.NewBorderLayout(scroll, nil, nil, nil), scroll, rect)
 			dialog.ShowCustom("数字范围", "确认", contain, w)
-		case "字母":
+		case wordMold:
 			content.SetPlaceHolder("example: a-z/A-Z")
 			content.OnChanged = func(text string) {
 				//fmt.Println("Entered", text)
@@ -107,7 +115,7 @@ func setFixBox(fix string, w fyne.Window) fyne.CanvasObject {
 			scroll := widget.NewScrollContainer(widget.NewHBox(content))
 			contain := fyne.NewContainerWithLayout(layout.NewBorderLayout(scroll, nil, nil, nil), scroll, rect)
 			dialog.ShowCustom("字母范围", "确认", contain, w)
-		case "随机":
+		case randMold:
 			content.SetPlaceHolder("example: 012...abcd...xyz")
 			content.OnChanged = func(text string) {
 				//fmt.Println("Entered", text)
@@ -123,4 +131,27 @@ func setFixBox(fix string, w fyne.Window) fyne.CanvasObject {
 	radio.Horizontal = true
 	box := widget.NewHBox(text1, con1, text2, radio)
 	return box
+}
+
+func renameBox() fyne.CanvasObject {
+	length := widget.NewEntry()
+	length.SetText("5")
+	scroll := widget.NewScrollContainer(widget.NewHBox(length))
+	contain := fyne.NewContainerWithLayout(layout.NewBorderLayout(scroll, nil, nil, nil), scroll)
+	form := widget.NewForm()
+	form.Append("文件名长度:", contain)
+	content := widget.NewEntry()
+	content.SetText(defaultRandStr)
+	content.SetPlaceHolder("example: 012...abcd...xyz")
+	sc := widget.NewScrollContainer(widget.NewHBox(content))
+	con := fyne.NewContainerWithLayout(layout.NewBorderLayout(sc, nil, nil, nil), sc)
+	form.Append("随机内容范围:", con)
+	return form
+}
+
+func StartButton() fyne.CanvasObject {
+	button := widget.NewButtonWithIcon("开始", theme.MailSendIcon(), func() {
+
+	})
+	return button
 }

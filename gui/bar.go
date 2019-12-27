@@ -10,9 +10,6 @@ import (
 	"os"
 )
 
-const WinFontPath = `C:\Windows\Fonts\SIMKAI.TTF`
-const LinuxFontPath = `/usr/share/fonts/truetype/arphic/ukai.ttc`
-
 type PwdBar struct {
 	content []byte
 }
