@@ -36,7 +36,7 @@ func main() {
 	)
 	group := widget.NewGroup("重命名规则", gui.RuleBox(w))
 	iBox := widget.NewHBox(labelBox, contentBox)
-	content := widget.NewVBox(iBox, group, gui.StartButton())
+	content := widget.NewVBox(iBox, group, gui.StartButton(w))
 	w.SetContent(content)
 	//w.Resize(fyne.NewSize(800, 600))
 	w.ShowAndRun()
